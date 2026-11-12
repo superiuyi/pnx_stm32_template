@@ -23,6 +23,7 @@ add_subdirectory(bsp)
 include(configs/scripts/generate_config.cmake)
 add_subdirectory(devices)
 add_subdirectory(modules)
+add_subdirectory(Thread)          # ← 新增
 target_link_libraries(${PROJECT_NAME} modules)
 
 # Start RFID from ThreadX initialization while leaving the BSP startup hook unchanged.
