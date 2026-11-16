@@ -1,6 +1,7 @@
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/thread.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/led.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/oled.cpp"
 
 )
 # #  写法 1：绝对路径（当前做法，最清晰）

@@ -8,6 +8,7 @@
 #include "usart.h"
 #include "usb_otg.h"
 #include "gpio.h"
+#include "i2c.h"
 
 extern "C" void SystemClock_Config(void);
 extern "C" void PeriphCommonClock_Config(void);
@@ -34,6 +35,7 @@ int main(void)
     MX_USB_OTG_FS_PCD_Init();
     MX_USART2_UART_Init();
     MX_TIM7_Init();
+    MX_I2C2_Init();
     tx_kernel_enter();
     return 1;
 }

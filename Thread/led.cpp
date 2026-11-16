@@ -20,8 +20,7 @@ static void entry(ULONG)
 
 void led_start()
 {
-
-    tx_thread_create(&led_thread, (CHAR*)"thread", entry, 0,
+    tx_thread_create(&led_thread, (CHAR*)"led_thread", entry, 0,
                      stack, sizeof(stack), 15, 15,
                      TX_NO_TIME_SLICE, TX_AUTO_START);
 }

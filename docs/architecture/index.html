@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Embedded Framework 架构导览：为什么分层、每层管什么、请求如何穿过各层。">
+  <title>Embedded Framework · 架构导览</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow-a" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow-b" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#top" aria-label="回到顶部">
+        <span class="brand-mark">EF</span>
+        <span class="brand-text">Embedded Framework <em>架构导览</em></span>
+      </a>
+      <nav class="nav" id="nav" aria-label="页面导航">
+        <a href="#why">为什么分层</a>
+        <a href="#map">架构地图</a>
+        <a href="#journey">请求旅程</a>
+        <a href="#cmake">构建链路</a>
+        <a href="#wizard">加功能</a>
+        <a href="#dictionary">文件词典</a>
+        <a href="#quiz">小测验</a>
+      </nav>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="切换主题">🌙</button>
+        <button class="icon-btn nav-toggle" id="navToggle" type="button" aria-label="打开导航" aria-expanded="false">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="top">
+      <div class="hero-copy reveal">
+        <div class="eyebrow"><span class="pulse-dot"></span> 基于 README 与源码生成 · 可离线打开</div>
+        <h1>一块板子，<br><span class="grad">七层分工</span>。</h1>
+        <p class="lead">
+          这套工程把“业务想法”和“寄存器细节”拆开。
+          下面用 6 个互动模块，带你看懂：为什么分层、每层管什么、一次请求怎么穿过它们。
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#why">开始探索 <span aria-hidden="true">→</span></a>
+          <a class="btn ghost" href="#journey">直接看请求旅程</a>
+        </div>
+        <div class="hero-stats">
+          <div><strong>2</strong><span>块板子</span></div>
+          <div><strong>7</strong><span>层职责</span></div>
+          <div><strong>4</strong><span>条请求链</span></div>
+          <div><strong>55</strong><span>个子文件夹</span></div>
+        </div>
+      </div>
+      <div class="hero-visual reveal">
+        <div class="stack-visual" id="heroStack" aria-label="架构分层示意"></div>
+        <div class="hero-hint">点任意一层，跳到架构地图</div>
+      </div>
+    </section>
+
+    <section class="section" id="why">
+      <div class="section-head reveal">
+        <div class="kicker">01 · 为什么分层</div>
+        <h2>不分层，最后会变成“谁都不敢改”</h2>
+        <p>
+          分层不是为了好看，而是把变化关进小盒子里：
+          换板子、换引脚、换 IMU、加线程，都只动一小块。
+        </p>
+      </div>
+
+      <div class="why-controls reveal">
+        <div class="segmented" id="whyToggle" role="group" aria-label="对比视图">
+          <button type="button" data-view="both" class="active">并排对比</button>
+          <button type="button" data-view="flat">只看一锅炖</button>
+          <button type="button" data-view="layered">只看分层</button>
+        </div>
+        <button class="btn small" id="btnBoardSwap" type="button">模拟：换一块板子</button>
+      </div>
+
+      <div class="why-stage reveal" id="whyStage">
+        <article class="why-panel flat-panel" id="flatPanel">
+          <div class="why-panel-head">
+            <div>
+              <span class="pain-label">反面教材</span>
+              <h3>一个 main.cpp 管所有事</h3>
+            </div>
+            <span class="badge bad">改动会传染</span>
+          </div>
+          <div class="flat-map" aria-hidden="true">
+            <span class="flat-chip c1">业务逻辑</span>
+            <span class="flat-chip c2">HAL_GPIO_WritePin</span>
+            <span class="flat-chip c3">引脚宏</span>
+            <span class="flat-chip c4">RFID 协议</span>
+            <span class="flat-chip c5">线程创建</span>
+            <span class="flat-chip c6">CubeMX 配置</span>
+            <span class="flat-chip c7">JSON 解析</span>
+            <span class="flat-chip c8">电机控制</span>
+            <span class="flat-chip c9">PID</span>
+            <span class="flat-chip c10">串口收发</span>
+            <div class="flat-tangle"></div>
+          </div>
+          <p class="why-note" id="flatNote">
+            换一个引脚，要在这个文件里全局搜索；CubeMX 重新生成，还可能把手写代码覆盖掉。
+          </p>
+          <div class="edit-meter" id="flatMeter" hidden>
+            <span class="edit-count">12</span>
+            <span>处需要改动</span>
+          </div>
+        </article>
+
+        <article class="why-panel layered-panel" id="layeredPanel">
+          <div class="why-panel-head">
+            <div>
+              <span class="pain-label">这个工程</span>
+              <h3>每层只回答一个问题</h3>
+            </div>
+            <span class="badge good">改动被隔离</span>
+          </div>
+          <div class="mini-stack" aria-hidden="true">
+            <div class="mini-layer" style="--c:#fbbf24"><span>应用</span><em>要做什么</em></div>
+            <div class="mini-layer" style="--c:#f472b6"><span>服务</span><em>谁持续干活</em></div>
+            <div class="mini-layer" style="--c:#60a5fa"><span>设备</span><em>器件怎么说话</em></div>
+            <div class="mini-layer" style="--c:#a78bfa"><span>基础库</span><em>通用工具</em></div>
+            <div class="mini-layer" style="--c:#34d399"><span>外设</span><em>怎么读写硬件</em></div>
+            <div class="mini-layer" style="--c:#22d3ee"><span>板级</span><em>这块板子是什么</em></div>
+            <div class="mini-layer" style="--c:#94a3b8"><span>硬件</span><em>STM32 + 外设</em></div>
+          </div>
+          <p class="why-note" id="layeredNote">
+            换板子时，业务、服务、设备、外设层基本不动；只改板级映射、配置和构建预设。
+          </p>
+          <div class="edit-meter good" id="layeredMeter" hidden>
+            <span class="edit-count">2</span>
+            <span>层需要改动</span>
+          </div>
+        </article>
+      </div>
+
+      <div class="pain-grid" id="painGrid"></div>
+    </section>
+
+    <section class="section" id="map">
+      <div class="section-head reveal">
+        <div class="kicker">02 · 架构地图</div>
+        <h2>每一层，只回答一个问题</h2>
+        <p>
+          三栏：先点“层”，再点这一层的“子文件夹”，右边展开文件、关键接口、谁在用它、它依赖谁。
+          红色标签是“它不负责”的事——边界比功能更重要。
+        </p>
+      </div>
+
+      <div class="map-layout reveal">
+        <div class="layer-rail" id="layerList" role="tablist" aria-label="架构层"></div>
+        <div class="group-rail panel" id="groupList" role="tablist" aria-label="子文件夹"></div>
+        <div class="layer-detail panel" id="layerDetail" aria-live="polite"></div>
+      </div>
+
+      <div class="crosscut-grid reveal" id="crosscutGrid"></div>
+    </section>
+
+    <section class="section" id="journey">
+      <div class="section-head reveal">
+        <div class="kicker">03 · 请求旅程</div>
+        <h2>跟着一次请求，穿过整个工程</h2>
+        <p>
+          选一个场景，点“下一步”，看控制流从复位、RTOS、应用线程一路走到硬件。
+          每一步都会告诉你“现在在哪一层”。
+        </p>
+      </div>
+
+      <div class="scenario-tabs reveal" id="scenarioTabs" role="tablist" aria-label="请求场景"></div>
+      <div class="journey-layers reveal" id="journeyLayerChips" aria-hidden="true"></div>
+
+      <div class="journey-layout reveal">
+        <div class="journey-timeline" id="journeySteps"></div>
+        <div class="journey-card panel" id="journeyCard" aria-live="polite"></div>
+      </div>
+
+      <div class="journey-controls reveal">
+        <button class="btn small" id="btnPrev" type="button">← 上一步</button>
+        <button class="btn small primary" id="btnNext" type="button">下一步 →</button>
+        <button class="btn small" id="btnAuto" type="button">▶ 自动播放</button>
+        <button class="btn small" id="btnReplay" type="button">↻ 重播</button>
+        <div class="progress" aria-hidden="true"><div id="journeyProgress"></div></div>
+      </div>
+    </section>
+
+    <section class="section" id="cmake">
+      <div class="section-head reveal">
+        <div class="kicker">04 · 构建链路</div>
+        <h2>源码是怎么被“凑”成固件的</h2>
+        <p>
+          这张图不是运行时调用链，而是 CMake 的 target 依赖。
+          点节点看它负责什么；<code>INTERFACE</code> 库只是“清单”，不是箱子。
+        </p>
+      </div>
+
+      <div class="cmake-layout reveal">
+        <div class="graph-wrap panel">
+          <div class="graph-toolbar">
+            <span class="muted">点击节点查看职责 · 悬停高亮连线</span>
+            <button class="btn tiny" id="btnGraphMode" type="button">只看主链</button>
+          </div>
+          <svg id="graphSvg" viewBox="0 0 1000 620" role="img" aria-label="CMake 目标依赖图"></svg>
+        </div>
+        <div class="graph-detail panel" id="graphDetail" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="section" id="wizard">
+      <div class="section-head reveal">
+        <div class="kicker">05 · 加功能向导</div>
+        <h2>我想改点东西，该动哪一层？</h2>
+        <p>
+          选一个任务，得到“改哪层、改哪些文件、别动哪里、怎么验证”的清单。
+          这是最实用的部分。
+        </p>
+      </div>
+
+      <div class="wizard-grid reveal" id="wizardGrid"></div>
+      <div class="wizard-detail panel" id="wizardDetail" aria-live="polite"></div>
+    </section>
+
+    <section class="section" id="dictionary">
+      <div class="section-head reveal">
+        <div class="kicker">06 · 文件词典</div>
+        <h2>每个子文件夹，到底是干嘛的</h2>
+        <p>
+          55 个子文件夹 + 100 多个文件/接口条目。按层筛选，或直接搜“spi / pwm / dsp / buzzer / wrapper”。
+          点卡片展开“它做什么、关键文件、什么时候会用到”。
+        </p>
+      </div>
+
+      <div class="dict-controls reveal">
+        <input id="dictSearch" type="search" placeholder="搜索文件夹、职责、关键词…" aria-label="搜索文件词典">
+        <div class="dict-filters" id="dictFilters" role="group" aria-label="按层筛选"></div>
+        <span class="dict-count" id="dictCount"></span>
+      </div>
+      <div class="dict-grid" id="dictGrid"></div>
+    </section>
+
+    <section class="section" id="quiz">
+      <div class="section-head reveal">
+        <div class="kicker">07 · 小测验</div>
+        <h2>用 4 道题，确认你真的看懂了</h2>
+        <p>点选项立刻得到反馈。答错也没关系，解释会告诉你为什么。</p>
+      </div>
+
+      <div class="quiz-head reveal">
+        <div class="quiz-score" id="quizScore">答对 0 / 4</div>
+        <button class="btn tiny" id="quizReset" type="button">重新开始</button>
+      </div>
+      <div class="quiz-grid" id="quizList"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div>
+      <strong>Embedded Framework 架构导览</strong>
+      <p>基于仓库 README、CMake 与源码生成。打开方式：直接双击 <code>docs/architecture/index.html</code>。</p>
+    </div>
+    <a class="back-top" href="#top">回到顶部 ↑</a>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
