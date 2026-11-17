@@ -34,7 +34,7 @@
             "remoter_dr16_enabled": true,
             "remoter_vt03_enabled": true,
             "remoter_ps2_enabled": true,
-            "bmi088_heater_enabled": true,
+            "bmi088_heater_enabled": false,
             "rfid_uart": "usart10",
             "buzzer_timer": "tim12",
             "buzzer_channel": 2
@@ -48,7 +48,7 @@
             "dmimu_can": "can1",
             "ahrs_device": "bmi088",
             "bmi088_thermal": {
-                "target": 45.0,
+                "target": 60.0,
                 "boost": 0.06,
                 "reboost": 0.05,
                 "approach_start": 0.044,
@@ -63,7 +63,7 @@
             "remoter_dr16_enabled": true,
             "remoter_vt03_enabled": true,
             "remoter_ps2_enabled": false,
-            "bmi088_heater_enabled": false,
+            "bmi088_heater_enabled": true,
             "rfid_uart": "usart1",
             "buzzer_timer": "tim4",
             "buzzer_channel": 3
