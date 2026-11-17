@@ -43,9 +43,9 @@ inline constexpr auto ps2_spi = bsp::spi::handle::spi1;
 #define USER_REMOTER_PS2 0
 inline constexpr char ahrs_device[] = "bmi088";
 inline constexpr bool bmi088_heater_enabled = true;
-inline constexpr imu::bmi088_thermal bmi088_thermal{60.0f, 0.059999999999999998f,
-    0.050000000000000003f, 0.043999999999999997f, 0.029000000000000001f, 0.040000000000000001f,
-    650.0f, 0.080000000000000002f, 10.0f, 900.0f};
+inline constexpr imu::bmi088_thermal bmi088_thermal{45.0f, 0.40000000000000002f,
+    0.29999999999999999f, 0.29999999999999999f, 0.29999999999999999f, 0.20000000000000001f,
+    650.0f, 1.0f, 10.0f, 900.0f};
 inline constexpr bsp::can::config dmimu_can{bsp::can::handle::can1, bsp::can::id_type::standard};
 inline constexpr auto rfid_uart = bsp::peripherals::usart1;
 inline constexpr buzzer::config rfid_buzzer{bsp::peripherals::tim4,

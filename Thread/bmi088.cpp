@@ -24,19 +24,20 @@ static void entry(ULONG)
         const auto heater = imu::bmi088_heater::read();
 
         char prt[128];
+
         int n=snprintf(prt, sizeof(prt), 
-        "temp=%d ax=%d ay=%d az=%d | gx=%d gy=%d gz=%d\n", 
-        (long)(temp),
+        "temp=%d.%d ax=%d ay=%d az=%d | gx=%d gy=%d gz=%d\n", 
+        (long)(temp),(long)(((long)(temp*100))%100),
         (long)(accel.x*1000.0f),
         (long)(accel.y * 1000.0f),
         (long)(accel.z * 1000.0f),
         (long)(gyro.x * 1000.0f),
         (long)(gyro.y * 1000.0f),
         (long)(gyro.z * 1000.0f));
+        HAL_UART_Transmit(&huart6, (uint8_t*)prt, (uint16_t)n, 100);
 
         tx_thread_sleep(100);
         // bsp::usart::transmit();
-
     }
    // pnxtypes::status a=sensor.readreg();
 }
