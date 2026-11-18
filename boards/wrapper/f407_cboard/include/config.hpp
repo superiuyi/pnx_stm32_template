@@ -148,7 +148,6 @@ inline constexpr bsp::gpio::config gyro_drdy{bsp::gpio::port::c, 5, bsp::active_
 inline constexpr auto heater_timer = bsp::pwm::handle::tim10;
 inline constexpr auto heater_channel = bsp::pwm::channel::ch1;
 } // namespace bmi088
-//wrapper里面
 
 namespace led
 {

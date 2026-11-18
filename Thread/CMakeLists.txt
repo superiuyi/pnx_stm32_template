@@ -3,6 +3,8 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/led.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/oled.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/bmi088.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/motor.cpp"
+
 )
 # #  写法 1：绝对路径（当前做法，最清晰）
 # target_sources(${CMAKE_PROJECT_NAME} PRIVATE

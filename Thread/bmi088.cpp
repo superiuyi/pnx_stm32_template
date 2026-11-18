@@ -1,4 +1,4 @@
-#include "tx_api.h"
+/*#include "tx_api.h"
 #include "user_config.hpp"
 #include <cstdio>
 #include "bmi088.hpp"
@@ -60,4 +60,70 @@ void bmi088_start()
     tx_thread_create(&bmi088_thread, (CHAR*)"bmi088_thread", entry, 0,
                      stack, sizeof(stack), 15, 15,
                      TX_NO_TIME_SLICE, TX_AUTO_START);
+}
+                     */
+#include "tx_api.h"
+#include "bmi088.hpp"
+#include "attitude.hpp"
+#include "usart.h"
+
+#include <cstdio>
+
+static TX_THREAD bmi088_thread;
+static UCHAR stack[2048];
+
+static void entry(ULONG)
+{
+    auto sub = imu::attitude::output.subscribe();
+
+    for (;;)
+    {
+        imu::attitude::state s{};
+
+        if (sub.available() &&
+            sub.read(s) == pnxtypes::status::ok)
+        {
+            // 加热状态由服务内部维护，这里只读快照
+            const auto heater = imu::bmi088_heater::read();
+
+            char prt[256];
+            int n = std::snprintf(prt, sizeof(prt),
+                "T=%ldC stage=%d online=%d "
+                "duty=%ld active=%d stable=%d hres=%d | "
+                "ax=%ld ay=%ld az=%ld | "
+                "gx=%ld gy=%ld gz=%ld | "
+                "r=%ld p=%ld y=%ld\r\n",
+                (long)(s.temperature + 0.5f),
+                (int)s.stage,
+                s.online ? 1 : 0,
+                (long)(heater.duty * 1000.0f),
+                heater.active ? 1 : 0,
+                heater.stable ? 1 : 0,
+                (int)heater.result,
+                (long)(s.accel.x * 1000.0f),
+                (long)(s.accel.y * 1000.0f),
+                (long)(s.accel.z * 1000.0f),
+                (long)(s.gyro.x * 1000.0f),
+                (long)(s.gyro.y * 1000.0f),
+                (long)(s.gyro.z * 1000.0f),
+                (long)(s.roll * 1000.0f),
+                (long)(s.pitch * 1000.0f),
+                (long)(s.yaw * 1000.0f));
+
+            // HAL_UART_Transmit(&huart6, (uint8_t*)prt, (uint16_t)n, 100);
+        }
+
+        tx_thread_sleep(100);
+    }
+}
+
+void bmi088_start()
+{
+    // 启动 BMI088 采集、ESKF、加热
+    imu::start_bmi088();
+
+    // 创建应用侧消费线程
+    tx_thread_create(&bmi088_thread, (CHAR*)"bmi088_thread",
+        entry, 0, stack, sizeof(stack),
+        15, 15, TX_NO_TIME_SLICE, TX_AUTO_START);
 }
